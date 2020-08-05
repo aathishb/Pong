@@ -29,20 +29,49 @@ public class ai : MonoBehaviour
 
     void Update()
     {
-        if (difficulty == 0)
+        switch (difficulty)
         {
-            step = step2;
-            if (Input.GetKey(KeyCode.UpArrow) && transform.position.y < bound)
-            {
-                targetPos = new Vector2(xpos, transform.position.y + step);
-            }
-            if (Input.GetKey(KeyCode.DownArrow) && transform.position.y > -bound)
-            {
-                targetPos = new Vector2(xpos, transform.position.y - step);
-            }
+            case 0:
+                calc0();
+                break;
+            case 1:
+                calc1();
+                break;
+            case 2:
+                lim = -2;
+                calc2();
+                break;
+            case 3:
+                lim = -8;
+                calc2();
+                break;
         }
+        transform.position = Vector2.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
+    }
 
-        if (difficulty == 1 && ball.position.x > -1 && ballDir.x > 0)
+    void FixedUpdate()
+    {
+        ballPos0 = ballPos1;
+        ballPos1 = new Vector2(ball.position.x, ball.position.y);
+        ballDir = 50*(ballPos1 - ballPos0);        
+    }
+
+    void calc0()
+    {
+        step = step2;
+        if (Input.GetKey(KeyCode.UpArrow) && transform.position.y < bound)
+        {
+            targetPos = new Vector2(xpos, transform.position.y + step);
+        }
+        if (Input.GetKey(KeyCode.DownArrow) && transform.position.y > -bound)
+        {
+            targetPos = new Vector2(xpos, transform.position.y - step);
+        }
+    }
+
+    void calc1()
+    {
+        if (ball.position.x > -1 && ballDir.x > 0)
         {
             // Blindly follows ball
             step = stepAi;
@@ -69,16 +98,11 @@ public class ai : MonoBehaviour
                 }
             }
         }
+    }
 
-        if (difficulty == 2)
-        {
-            lim = -2;
-        }
-        else if (difficulty == 3)
-        {
-            lim = -8;
-        }
-        if ((difficulty == 2 || difficulty == 3) && ballDir.x > 0 && ball.position.x > lim)
+    void calc2()
+    {
+        if (ballDir.x > 0 && ball.position.x > lim)
         {
             // Calculates where ball is going to be and moves there
             step = stepAi;
@@ -118,14 +142,5 @@ public class ai : MonoBehaviour
                 }
             }
         }
-
-        transform.position = Vector2.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
-    }
-
-    void FixedUpdate()
-    {
-        ballPos0 = ballPos1;
-        ballPos1 = new Vector2(ball.position.x, ball.position.y);
-        ballDir = 50*(ballPos1 - ballPos0);        
     }
 }
